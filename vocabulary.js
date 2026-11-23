@@ -233,7 +233,7 @@
     } catch {
       // Use the book's definitions if saved edits cannot be read.
     }
-    return entry.senses || [];
+    return dataset.edits?.[entry.id]?.senses ?? entry.senses ?? [];
   }
 
   function editorForm(className, fields, saveValue, closeEditor, extraActions = []) {
@@ -344,10 +344,11 @@
   }
 
   function readNote(id) {
+    const backedUpNote = dataset.edits?.[id]?.note ?? '';
     try {
-      return localStorage.getItem(noteKey(id)) || '';
+      return localStorage.getItem(noteKey(id)) ?? backedUpNote;
     } catch {
-      return '';
+      return backedUpNote;
     }
   }
 
@@ -372,8 +373,7 @@
     input.setAttribute('aria-label', '笔记');
     showCellEditor('编辑笔记', entry, cell, renderNote, close =>
       editorForm('note-editor', [input], () => {
-        if (input.value.trim()) localStorage.setItem(noteKey(entry.id), input.value);
-        else localStorage.removeItem(noteKey(entry.id));
+        localStorage.setItem(noteKey(entry.id), input.value.trim() ? input.value : '');
       }, close));
   }
 
