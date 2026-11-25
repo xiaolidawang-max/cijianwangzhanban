@@ -1,0 +1,2 @@
+# Keep the launcher’s CRLF line endings in GitHub ZIP downloads.
+创建桌面快捷方式.cmd -text whitespace=cr-at-eol
