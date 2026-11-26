@@ -6,7 +6,7 @@ set "CIJIAN_SITE_DIR=%~dp0"
 powershell.exe -NoLogo -NoProfile -NonInteractive -Command ^
   "$ErrorActionPreference = 'Stop';" ^
   "$root = $env:CIJIAN_SITE_DIR;" ^
-  "$page = Join-Path $root 'index.html';" ^
+  "$page = Join-Path $root 'vocabulary.html';" ^
   "$icon = Join-Path $root 'assets\cijian.ico';" ^
   "if (!(Test-Path -LiteralPath $page -PathType Leaf) -or !(Test-Path -LiteralPath $icon -PathType Leaf)) { throw '请先完整解压词间文件夹，再运行此脚本。' };" ^
   "$desktop = [Environment]::GetFolderPath('DesktopDirectory');" ^

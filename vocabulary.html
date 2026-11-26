@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>词汇 · 词间</title>
+  <link rel="icon" href="assets/cijian.ico">
+  <link rel="stylesheet" href="vocabulary.css?v=home-link">
+  <script src="vocabulary-data.js?v=backup-edits" defer></script>
+  <script src="vocabulary.js?v=backup-edits" defer></script>
+</head>
+<body>
+  <svg class="icon-symbols" aria-hidden="true">
+    <symbol id="icon-eye" viewBox="0 0 24 24">
+      <path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+      <circle cx="12" cy="12" r="2.5"/>
+    </symbol>
+    <symbol id="icon-eye-off" viewBox="0 0 24 24">
+      <path d="m3.5 3.5 17 17m-10.3-14.3A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a16 16 0 0 1-2.5 3M6.4 7.8A16 16 0 0 0 2.5 12S6 18 12 18a10 10 0 0 0 4.2-.9m-6-6.9a2.5 2.5 0 0 0 3.6 3.6"/>
+    </symbol>
+    <symbol id="icon-pencil" viewBox="0 0 24 24">
+      <path d="m14.5 5.5 4 4M4 20l4.7-1.1 11-11a2.8 2.8 0 0 0-4-4l-11 11L4 20Z"/>
+    </symbol>
+    <symbol id="icon-directory" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="16" rx="2"/>
+      <path d="M9 4v16"/>
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24">
+      <circle cx="10.5" cy="10.5" r="6.5"/>
+      <path d="m16 16 4 4"/>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
+    <symbol id="icon-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+    <symbol id="icon-speaker" viewBox="0 0 24 24">
+      <path d="M3 9h4l5-4v14l-5-4H3V9Zm12.5-.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"/>
+    </symbol>
+    <symbol id="icon-settings" viewBox="0 0 24 24">
+      <path d="m10 3-.6 2.2-1.7 1-2.2-.6-2 3.4 1.6 1.6v2.8l-1.6 1.6 2 3.4 2.2-.6 1.7 1 .6 2.2h4l.6-2.2 1.7-1 2.2.6 2-3.4-1.6-1.6v-2.8l1.6-1.6-2-3.4-2.2.6-1.7-1L14 3z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </symbol>
+  </svg>
+  <template id="cell-edit-button">
+    <button class="cell-edit-trigger" type="button" aria-haspopup="dialog" aria-controls="word-editor">
+      <svg aria-hidden="true"><use href="#icon-pencil"></use></svg>
+    </button>
+  </template>
+  <div class="vocabulary-page">
+    <header class="toolbar">
+      <div class="book-heading">
+        <button class="directory-toggle" id="toggle-directory" type="button" aria-controls="chapter-directory" aria-expanded="false">
+          <svg class="ui-icon" aria-hidden="true"><use href="#icon-directory"></use></svg>
+          <span>目录</span>
+        </button>
+        <h1 id="book-title">雅思词汇真经</h1>
+        <p id="site-total"></p>
+        <a class="home-link" href="./index.html">返回首页</a>
+      </div>
+      <div class="controls">
+        <label class="chapter-search">
+          <svg class="ui-icon" aria-hidden="true"><use href="#icon-search"></use></svg>
+          <input id="search" type="search" aria-label="搜索本章" placeholder="搜索本章">
+        </label>
+        <button id="play-chapter" type="button">
+          <svg class="ui-icon" aria-hidden="true"><use href="#icon-play"></use></svg>
+          <span>全章朗读</span>
+        </button>
+      </div>
+    </header>
+
+    <aside class="chapter-directory" id="chapter-directory">
+      <div class="directory-header">
+        <a class="wordmark" href="#/vocabulary" aria-label="词间词汇首页">词间</a>
+        <button class="directory-toggle" id="close-directory" type="button" aria-label="收起章节目录" title="收起章节目录" aria-controls="chapter-directory">
+          <svg class="ui-icon" aria-hidden="true"><use href="#icon-directory"></use></svg>
+        </button>
+      </div>
+      <div class="directory-heading">
+        <h2 id="directory-title">章节</h2>
+        <span id="directory-total"></span>
+      </div>
+      <nav id="chapter-list" aria-labelledby="directory-title"></nav>
+    </aside>
+
+    <main id="vocabulary" class="workspace" aria-labelledby="book-title">
+
+      <p class="scroll-hint">横向滑动查看笔记</p>
+      <div class="table-scroller" tabindex="0" role="region" aria-label="词汇表">
+        <table>
+          <caption class="sr-only">雅思词汇真经单词表</caption>
+          <colgroup>
+            <col class="col-number">
+            <col class="col-audio">
+            <col class="col-word">
+            <col class="col-meaning">
+            <col>
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col" aria-label="序号"></th>
+              <th scope="col"><span class="sr-only">发音</span></th>
+              <th scope="col" class="visibility-heading">
+                <span class="column-heading">
+                  <span>单词</span>
+                  <button id="toggle-word-column" class="visibility-toggle" type="button" aria-label="隐藏英文单词" aria-controls="words" aria-pressed="false" title="隐藏英文单词">
+                    <svg aria-hidden="true"><use href="#icon-eye"></use></svg>
+                  </button>
+                </span>
+              </th>
+              <th scope="col" class="visibility-heading">
+                <span class="column-heading">
+                  <span title="点击释义旁的铅笔可编辑">中文意思</span>
+                  <button id="toggle-meaning-column" class="visibility-toggle" type="button" aria-label="隐藏中文意思" aria-controls="words" aria-pressed="false" title="隐藏中文意思">
+                    <svg aria-hidden="true"><use href="#icon-eye"></use></svg>
+                  </button>
+                </span>
+              </th>
+              <th scope="col" class="visibility-heading">
+                <span class="column-heading">
+                  <span title="点击铅笔可添加或编辑笔记">笔记</span>
+                  <button id="toggle-note-column" class="visibility-toggle" type="button" aria-label="隐藏笔记" aria-controls="words" aria-pressed="false" title="隐藏笔记">
+                    <svg aria-hidden="true"><use href="#icon-eye"></use></svg>
+                  </button>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="words"></tbody>
+        </table>
+      </div>
+      <p id="chapter-status" class="sr-only" role="status"></p>
+      <p id="audio-status" class="sr-only" role="status"></p>
+      <noscript><p>启用 JavaScript 后即可查看词汇和播放音频。</p></noscript>
+    </main>
+  </div>
+  <dialog class="word-detail" id="word-detail" aria-labelledby="detail-word">
+    <header class="detail-header">
+      <div class="detail-title-line">
+        <h2 id="detail-word" lang="en-US" aria-live="polite" aria-atomic="true"></h2>
+        <span class="audio">
+          <button id="detail-audio" type="button" aria-label="播放读音" aria-pressed="false">
+            <svg class="ui-icon" aria-hidden="true"><use href="#icon-speaker"></use></svg>
+          </button>
+        </span>
+      </div>
+      <p id="detail-ipa" lang="en-US" title="美式音标"></p>
+      <div class="detail-actions">
+        <div class="detail-action">
+          <button id="detail-visibility-trigger" class="visibility-toggle" type="button" aria-controls="detail-visibility-panel" aria-expanded="false" aria-label="显示选项" title="显示选项">显</button>
+          <div id="detail-visibility-panel" class="detail-menu detail-visibility-panel" role="group" aria-label="显示选项" hidden>
+            <label><input id="hide-detail-word" type="checkbox"> 隐藏英文和音标</label>
+            <label><input id="hide-detail-meaning" type="checkbox"> 隐藏中文意思</label>
+          </div>
+        </div>
+        <div class="detail-action">
+          <button id="detail-playback-trigger" class="visibility-toggle" type="button" aria-controls="detail-playback-panel" aria-expanded="false" aria-label="播放设置" title="播放设置">
+            <svg class="ui-icon" aria-hidden="true"><use href="#icon-settings"></use></svg>
+          </button>
+          <div id="detail-playback-panel" class="detail-menu detail-playback-panel" role="group" aria-label="播放设置" hidden>
+            <label class="playback-autoplay"><input id="detail-autoplay" type="checkbox"> 自动播放</label>
+            <label class="playback-repeat">播放次数 <input id="detail-repeat" type="number" min="1" step="1" value="1"></label>
+            <div class="playback-rate">
+              <label for="detail-rate">播放速度</label>
+              <output id="detail-rate-value" for="detail-rate">1.0×</output>
+              <input id="detail-rate" type="range" min="0.5" max="2" step="0.1" value="1">
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="detail-close" id="detail-close" type="button" aria-label="关闭单词详情" title="关闭（Esc）" autofocus>×</button>
+      <p id="detail-audio-status" role="status"></p>
+    </header>
+    <div class="detail-body">
+      <section class="detail-section" aria-labelledby="detail-senses-heading">
+        <h3 id="detail-senses-heading">中文意思</h3>
+        <div id="detail-senses"></div>
+      </section>
+      <section class="detail-section" aria-labelledby="detail-note-heading">
+        <h3 id="detail-note-heading">笔记</h3>
+        <div id="detail-note"></div>
+      </section>
+    </div>
+    <footer class="detail-footer">
+      <button id="detail-previous" type="button" title="上一词（←）">← 上一词</button>
+      <span id="detail-position"></span>
+      <button id="detail-next" type="button" title="下一词（→）">下一词 →</button>
+    </footer>
+  </dialog>
+  <dialog class="word-editor" id="word-editor" aria-labelledby="word-editor-title"></dialog>
+</body>
+</html>
