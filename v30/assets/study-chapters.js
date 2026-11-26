@@ -26,6 +26,7 @@
         setExpandedChapter(open=>open===id?null:id);
       }
       return hs('div',{className:'sc-page',children:[
+        host.CijianContinuous.siteNav(jsx,'study'),
         hs('header',{className:'sc-header',children:[
           h('button',{type:'button',className:'sc-icon','aria-label':'返回模式选择',onClick:onModes,children:h(Icon,{name:'back'})}),
           h('h1',{children:'学习模式'}),

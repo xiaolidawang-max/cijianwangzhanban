@@ -233,7 +233,7 @@
     }
     function PlaybackDirectory({words,currentIndex,description,getContent,meaningRevision,close,choose,inline=false}){
       const [query,setQuery]=useState('');
-      const listRef=useRef(null),titleRef=useRef(null);
+      const listRef=useRef(null),titleRef=useRef(null),previousQuery=useRef(query);
       const [viewport,setViewport]=useState({top:0,height:600});
       const rowHeight=inline?56:76;
       const items=useMemo(()=>words.map((word,index)=>({
@@ -247,15 +247,17 @@
       useLayoutEffect(()=>{
         const list=listRef.current;
         if(!list)return;
-        list.scrollTop=query.trim()?0:Math.max(0,currentIndex*rowHeight-(list.clientHeight-rowHeight)/2);
+        if(!query.trim())list.scrollTop=Math.max(0,currentIndex*rowHeight-(list.clientHeight-rowHeight)/2);
+        else if(previousQuery.current!==query)list.scrollTop=0;
+        previousQuery.current=query;
         measure();
-      },[query,currentIndex]);
+      },[query,currentIndex,rowHeight]);
       useEffect(()=>{
-        titleRef.current?.focus();
-        if(!host.ResizeObserver)return;
+        if(!inline)titleRef.current?.focus();
+        if(!host.ResizeObserver||!listRef.current)return;
         const observer=new host.ResizeObserver(measure);observer.observe(listRef.current);
         return()=>observer.disconnect();
-      },[]);
+      },[inline]);
       const start=Math.min(Math.max(0,results.length-1),Math.max(0,Math.floor(viewport.top/rowHeight)-6));
       const end=Math.min(results.length,Math.ceil((viewport.top+viewport.height)/rowHeight)+6);
       // Keep long custom ranges light while retaining their original sequence numbers.
@@ -309,7 +311,16 @@
       ]});
     }
     const setupTabs=[{id:'range',label:'播放范围'},{id:'reading',label:'朗读'},{id:'rhythm',label:'播放与显示'}];
-    function Page({words,chapters,currentWordId,getContent,exit}){
+    function Page({title,words,chapters,currentWordId,getContent,exit}){
+      const [desktop,setDesktop]=useState(()=>Boolean(host.matchMedia?.('(min-width: 1000px)').matches));
+      useEffect(()=>{
+        const media=host.matchMedia?.('(min-width: 1000px)');
+        if(!media)return;
+        const update=()=>setDesktop(media.matches);
+        update();
+        media.addEventListener?.('change',update);
+        return()=>media.removeEventListener?.('change',update);
+      },[]);
       const initial=useRef(null);
       if(!initial.current){
         try{initial.current={settings:core().loadSettings(host.localStorage,words,currentWordId),error:'',blocked:false}}
@@ -469,7 +480,6 @@
       useLayoutEffect(()=>{presenter.show(screen==='player'?current?.id:'')});
       const content=useMemo(()=>current?getContent(current):{english:'',meaning:''},[current,getContent]);
       const defaultMeaning=content.coreMeaning||selectCoreMeaning([],content.meaning);
-      const meaningGroups=displayedMeaningGroups(current,content);
       const first=byId.get(settings.startId),last=byId.get(settings.endId);
       navigationChangeRef.current=(view,source)=>{
         setDisplayOpen(false);
@@ -559,6 +569,11 @@
         directoryReturnRef.current={...directoryReturnRef.current,index,selected:true};
         ensureNavigation().back();
       }
+      function playFromQueue(index){
+        const player=ensurePlayer();
+        player.seek(index);
+        if(running)player.play();
+      }
       function editMeaning(){
         if(!current||editingWord)return;
         ensurePlayer().pause();
@@ -634,18 +649,10 @@
         event.currentTarget.parentElement.querySelectorAll('[role="tab"]')[next].focus();
       }
       function panel(id){
+        if(desktop)return {};
         return {id:'cc-panel-'+id,role:'tabpanel',hidden:setupTab!==id,'aria-labelledby':'cc-tab-'+id,tabIndex:0};
       }
-      const setupUI=hs('div',{className:'cc-setup-shell cc-setup-native',children:[
-        hs('header',{className:'cc-topbar cc-setup-topbar',children:[
-          h('button',{type:'button',className:'cc-icon-button cc-back-button','aria-label':'退出简洁模式',onClick:leave,children:h(Icon,{name:'back',size:20})}),
-          h('h1',{ref:setupTitleRef,tabIndex:-1,children:'简洁模式'})
-        ]}),
-        h('div',{className:'cc-setup-tabs',role:'tablist','aria-label':'简洁模式设置',children:setupTabs.map(({id,label},index)=>
-          h('button',{type:'button',role:'tab',id:'cc-tab-'+id,'aria-controls':'cc-panel-'+id,'aria-selected':setupTab===id,tabIndex:setupTab===id?0:-1,onClick:()=>setSetupTab(id),onKeyDown:e=>tabKeyDown(e,index),children:label},id)
-        )}),
-        hs('main',{className:'cc-setup-main',ref:settingsMainRef,children:[
-          hs('section',{className:'cc-setup-section cc-range-section',...panel('range'),children:[
+      const rangePanel=hs('section',{className:'cc-setup-section cc-range-section',...panel('range'),children:[
             hs('div',{className:'cc-segment cc-range-mode',role:'group','aria-label':'播放范围方式',children:[
               h('button',{type:'button','aria-label':'按章节播放','aria-pressed':settings.selectionMode==='chapter',onClick:()=>changeSelectionMode('chapter'),children:'按章节'}),
               h('button',{type:'button','aria-label':'自定义播放范围','aria-pressed':settings.selectionMode==='custom',onClick:()=>changeSelectionMode('custom'),children:'自定义'})
@@ -656,15 +663,16 @@
               return hs('div',{className:'cc-chapter-entry',children:[
                 h(ChapterHeader,{chapter:c,selected,expanded,panelId,buttonRef:expanded?expandedButtonRef:undefined,select:checked=>selectChapter(c.id,checked),expand:()=>toggleChapter(c.id),downloadButton:downloadButton(c)}),
                 offlineStatus[c.id]?.error&&h('p',{className:'cc-offline-message',role:'alert',children:offlineStatus[c.id].error}),
-                h('div',{id:panelId,hidden:!expanded,children:expanded&&screen==='setup'&&setupTab==='range'&&h(ChapterWords,{
+                h('div',{id:panelId,hidden:!expanded,children:expanded&&screen==='setup'&&(desktop||setupTab==='range')&&h(ChapterWords,{
                   description:c.label,words:c.words,getContent,meaningRevision,choose:index=>beginAtWord(c.words[index])
                 },c.id)})
               ]},c.id);
             })}):hs('div',{className:'cc-range-card',children:[rangeField('start','起始单词',first),rangeField('end','结束单词',last)]}),
             settings.selectionMode==='custom'&&h('p',{className:'cc-range-count',children:'已选 '+selected.range.length+' 词'}),
             selected.error&&h('p',{className:'cc-error',role:'alert',children:selected.error})
-          ]}),
-          hs('section',{className:'cc-setup-section cc-reading-section',...panel('reading'),children:[
+          ]});
+      const readingPanel=hs('section',{className:'cc-setup-section cc-reading-section',...panel('reading'),children:[
+            desktop&&h('h3',{className:'cw-field-heading',children:'朗读'}),
             hs('div',{className:'cc-audio-group','aria-label':'英文朗读设置',children:[
               hs('label',{className:'cc-option-row cc-audio-heading',children:[h('span',{children:'英文'}),h('input',{type:'checkbox',role:'switch','aria-label':'英文朗读',className:'cc-switch',checked:settings.readEnglish,onChange:e=>update('readEnglish',e.target.checked)})]}),
               settings.readEnglish&&h(NumberControl,{id:'cc-speed',label:'英文语速',displayLabel:'语速',inline:true,value:settings.speed,min:.5,max:3,unit:'×',onChange:value=>update('speed',value)}),
@@ -676,8 +684,9 @@
               settings.readChinese&&h(NumberControl,{id:'cc-chinese-speed',label:'中文语速',displayLabel:'语速',inline:true,value:settings.chineseSpeed,min:.5,max:3,unit:'×',onChange:value=>update('chineseSpeed',value)}),
               settings.readChinese&&h(NumberControl,{id:'cc-zh-volume',label:'中文音量',displayLabel:'音量',inline:true,value:settings.chineseVolume,min:0,max:200,step:1,unit:'%',onChange:value=>update('chineseVolume',value)})
             ]})
-          ]}),
-          hs('section',{className:'cc-setup-section cc-rhythm-section',...panel('rhythm'),children:[
+          ]});
+      const rhythmPanel=hs('section',{className:'cc-setup-section cc-rhythm-section',...panel('rhythm'),children:[
+            desktop&&h('h3',{className:'cw-field-heading',children:'播放与显示'}),
             hs('div',{className:'cc-options-card',children:[
               hs('label',{className:'cc-option-row',children:[h('span',{children:'自动播放'}),h('input',{type:'checkbox',role:'switch','aria-label':'自动播放',className:'cc-switch',checked:settings.autoAdvance,onChange:e=>setAutomatic(e.target.checked)})]}),
               hs('label',{className:'cc-option-row',children:[h('span',{children:'先读中文'}),h('input',{type:'checkbox',role:'switch','aria-label':'先读中文',className:'cc-switch',checked:settings.chineseFirst,onChange:e=>update('chineseFirst',e.target.checked)})]}),
@@ -685,19 +694,59 @@
               hs('div',{className:'cc-option-row cc-display-row',children:[h('span',{children:'显示内容'}),displayControls()]}),
               pictureSizeControl()
             ]})
-          ]}),
-          warning&&h('p',{className:'cc-warning',role:'status',children:warning})
-        ]}),
-        hs('footer',{className:'cc-setup-actions',children:[
+          ]});
+      const setupActions=hs('footer',{className:'cc-setup-actions',children:[
           hs('p',{className:'cc-selection-summary','aria-live':'polite',children:[
             h('span',{children:'已选'}),h('strong',{children:settings.selectionMode==='chapter'?(selectedChapters.length===1?selectedChapters[0].label:selectedChapters.length+' 个章节'):'自定义范围'}),
             h('span',{className:'cc-selection-total',children:selected.range.length+' 词'})
           ]}),
           hs('button',{type:'button',className:'cc-start',disabled:!selected.range.length,onClick:()=>begin(),children:[h(Icon,{name:settings.autoAdvance?'play':'arrow',size:16}),h('span',{children:settings.autoAdvance?'开始连播':'进入单词卡'})]})
+        ]});
+      const setupNotice=warning&&h('p',{className:'cc-warning',role:'status',children:warning});
+      const preview=desktop&&screen==='setup'?selected.range[0]:null;
+      const bookTitle=title||'雅思词汇真经';
+      const setupUI=desktop?hs('div',{className:'cc-setup-shell cc-setup-native cw-setup',children:[
+        hs('header',{className:'cc-topbar cw-heading',children:[
+          hs('div',{children:[h('p',{children:bookTitle}),h('h1',{ref:setupTitleRef,tabIndex:-1,children:'单词连播'})]})
+        ]}),
+        hs('main',{className:'cc-setup-main cw-grid',children:[
+          hs('aside',{className:'cw-range',children:[h('h2',{className:'cw-panel-heading',children:'播放范围'}),rangePanel]}),
+          hs('div',{className:'cw-stage',children:[
+            hs('section',{className:'cw-card-panel','aria-labelledby':'cw-preview-title',children:[
+              h('h2',{className:'cw-panel-heading',id:'cw-preview-title',children:'词卡预览'}),
+              preview?cardBody(preview,getContent(preview),false):h('p',{className:'cw-empty',children:'选择播放范围后，这里会显示第一张词卡。'})
+            ]}),setupActions,setupNotice
+          ]}),
+          hs('aside',{className:'cw-preferences',children:[
+            h('h2',{className:'cw-panel-heading',children:'播放设置'}),
+            hs('div',{className:'cw-preferences-body',children:[readingPanel,rhythmPanel]})
+          ]})
         ]})
+      ]}):hs('div',{className:'cc-setup-shell cc-setup-native',children:[
+        hs('header',{className:'cc-topbar cc-setup-topbar',children:[
+          h('button',{type:'button',className:'cc-icon-button cc-back-button','aria-label':'退出简洁模式',onClick:leave,children:h(Icon,{name:'back',size:20})}),
+          h('h1',{ref:setupTitleRef,tabIndex:-1,children:'简洁模式'})
+        ]}),
+        h('div',{className:'cc-setup-tabs',role:'tablist','aria-label':'简洁模式设置',children:setupTabs.map(({id,label},index)=>
+          h('button',{type:'button',role:'tab',id:'cc-tab-'+id,'aria-controls':'cc-panel-'+id,'aria-selected':setupTab===id,tabIndex:setupTab===id?0:-1,onClick:()=>setSetupTab(id),onKeyDown:e=>tabKeyDown(e,index),children:label},id)
+        )}),
+        hs('main',{className:'cc-setup-main',ref:settingsMainRef,children:[rangePanel,readingPanel,rhythmPanel,setupNotice]}),
+        setupActions
       ]});
-      const playerUI=current&&hs('div',{className:'cc-player-shell',children:[
-        hs('header',{className:'cc-topbar cc-player-topbar',children:[
+      function cardBody(word,bodyContent,editable){
+        const wordGroups=displayedMeaningGroups(word,bodyContent);
+        return hs(desktop?'section':'main',{className:'cc-player-body',style:{'--cc-picture-scale':settings.pictureSize/100},'data-chapter':word.chapter,'data-word-id':word.id,tabIndex:editable?0:undefined,'aria-label':settings.showEnglish?word.word+' 词卡':'词卡',children:[
+          h(WordPicture,{word,images,showEnglish:settings.showEnglish},word.id+'|'+word.imageUrl),
+          hs('div',{className:'cc-word-block'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,children:[h(desktop?'h3':'h1',{className:word.word.length>18?'cc-long-word':undefined,children:word.word}),h('p',{className:'cc-ipa',children:word.ipa||'\u00a0'})]}),
+          h('p',{className:'cc-english'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,lang:'en',children:bodyContent.english||'\u00a0'}),
+          hs('div',{className:'cc-meaning-row'+(settings.showChinese?'':' cc-content-hidden'),'aria-hidden':!settings.showChinese,children:[
+            h(MeaningBlock,{groups:wordGroups}),
+            editable&&h('button',{type:'button',className:'cc-edit-meaning',ref:editTriggerRef,'aria-label':'编辑中文释义',title:'编辑中文释义',onClick:editMeaning,children:h('svg',{width:17,height:17,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':true,children:h('path',{d:'m16 3 5 5M4 15 16.5 2.5a2.1 2.1 0 0 1 3 3L7 18l-4 1 1-4ZM3 22h18'})})})
+          ]}),
+          editable&&settings.readChinese&&state.chineseUnavailable&&h('p',{className:'cc-start-hint',role:'status',children:'暂无中文录音'})
+        ]});
+      }
+      const playerTopbar=hs('header',{className:'cc-topbar cc-player-topbar',children:[
           h('button',{type:'button',className:'cc-icon-button cc-back-button','aria-label':'返回播放设置',onClick:adjust,children:h(Icon,{name:'back',size:20})}),
           hs('button',{type:'button',className:'cc-player-position cc-directory-trigger',ref:directoryTriggerRef,'aria-label':'打开单词目录，当前第 '+(state.displayIndex+1)+' 词，共 '+sessionWords.length+' 词',title:'打开单词目录',onClick:openDirectory,children:[
             h(Icon,{name:'list',size:17}),h('span',{children:'目录'}),
@@ -707,18 +756,8 @@
             h('button',{type:'button',className:'cc-icon-button cc-display-trigger',ref:displayTriggerRef,'aria-label':'显示设置',title:'显示设置','aria-expanded':displayOpen,'aria-controls':displayOpen?'cc-display-popover':undefined,onClick:()=>setDisplayOpen(value=>!value),children:h(Icon,{name:'display',size:21})}),
             displayOpen&&hs('div',{className:'cc-display-popover',id:'cc-display-popover',children:[h('p',{children:'显示内容'}),displayControls(),pictureSizeControl()]})
           ]})
-        ]}),
-        hs('main',{className:'cc-player-body',style:{'--cc-picture-scale':settings.pictureSize/100},'data-chapter':current.chapter,'data-word-id':current.id,tabIndex:0,'aria-label':settings.showEnglish?current.word+' 连播词卡':'连播词卡',children:[
-          h(WordPicture,{word:current,images,showEnglish:settings.showEnglish},current.id+'|'+current.imageUrl),
-          hs('div',{className:'cc-word-block'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,children:[h('h1',{className:current.word.length>18?'cc-long-word':undefined,children:current.word}),h('p',{className:'cc-ipa',children:current.ipa||'\u00a0'})]}),
-          h('p',{className:'cc-english'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,lang:'en',children:content.english||'\u00a0'}),
-          hs('div',{className:'cc-meaning-row'+(settings.showChinese?'':' cc-content-hidden'),'aria-hidden':!settings.showChinese,children:[
-            h(MeaningBlock,{groups:meaningGroups}),
-            h('button',{type:'button',className:'cc-edit-meaning',ref:editTriggerRef,'aria-label':'编辑中文释义',title:'编辑中文释义',onClick:editMeaning,children:h('svg',{width:17,height:17,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':true,children:h('path',{d:'m16 3 5 5M4 15 16.5 2.5a2.1 2.1 0 0 1 3 3L7 18l-4 1 1-4ZM3 22h18'})})})
-          ]}),
-          settings.readChinese&&state.chineseUnavailable&&h('p',{className:'cc-start-hint',role:'status',children:'暂无中文录音'})
-        ]}),
-        hs('footer',{className:'cc-player-footer',children:[
+        ]});
+      const playerFooter=hs('footer',{className:'cc-player-footer',children:[
           state.error&&h('p',{className:'cc-error cc-play-error',role:'alert',children:state.error}),
           warning&&h('p',{className:'cc-warning cc-play-warning',children:warning}),
           hs('nav',{className:'cc-controls','aria-label':'连播控制',children:[
@@ -726,13 +765,63 @@
             hs('button',{type:'button',className:'cc-play-toggle','aria-label':completed?'再播一遍':running?'暂停连播':state.status==='error'?'重试播放':'继续播放',onClick:completed?()=>ensurePlayer().restart():toggle,children:[h(Icon,{name:completed?'repeat':running?'pause':'play',size:19}),h('span',{children:completed?'再播一遍':running?'暂停':state.status==='error'?'重试':'播放'})]}),
             h('button',{type:'button',className:'cc-skip','aria-label':'连播下一个单词',disabled:state.index>=sessionWords.length-1,onClick:()=>ensurePlayer().next(),children:h(Icon,{name:'next',size:24})})
           ]})
-        ]})
-      ]});
+        ]});
       const directoryDescription=settings.selectionMode==='chapter'?selectedChapters.map(chapter=>chapter.label).join(' → '):
         '自定义范围 · '+(sessionWords[0]?.word||'')+' — '+(sessionWords[sessionWords.length-1]?.word||'');
-      return hs('div',{className:'cc-page'+(screen==='player'?' cc-playing-page':screen==='setup'?' cc-settings-page':''),'data-playback-status':screen!=='setup'?state.status:undefined,'data-playback-language':screen==='player'?state.language:undefined,onKeyDown:keyboard,children:[h('div',{'aria-hidden':picker?'true':undefined,children:screen==='setup'?setupUI:screen==='directory'?h(PlaybackDirectory,{words:sessionWords,currentIndex:state.displayIndex,description:directoryDescription,getContent,meaningRevision,close:closeLayer,choose:chooseDirectoryWord}):playerUI}),pickerUI,editingWord&&h(MeaningEditor,{...editingWord,close:closeMeaningEditor,requestCloseRef:editorCloseRef},editingWord.word.id)]});
+      const playerUI=current&&(desktop?hs('div',{className:'cc-player-shell cw-player',children:[
+        hs('header',{className:'cc-topbar cw-heading',children:[
+          hs('div',{children:[h('p',{children:bookTitle}),h('h1',{children:'单词连播'})]}),
+          hs('button',{type:'button',className:'cw-back-settings',onClick:adjust,children:[h(Icon,{name:'back',size:17}),'调整播放范围与设置']})
+        ]}),
+        hs('main',{className:'cw-grid',children:[
+          hs('aside',{className:'cw-queue',children:[
+            h('h2',{className:'cw-panel-heading',children:'单词目录'}),
+            h('p',{className:'cw-queue-meta',children:directoryDescription}),
+            h(PlaybackDirectory,{words:sessionWords,currentIndex:state.displayIndex,description:directoryDescription,getContent,meaningRevision,choose:playFromQueue,inline:true})
+          ]}),
+          hs('div',{className:'cw-stage',children:[
+            hs('section',{className:'cw-card-panel','aria-labelledby':'cw-current-title',children:[
+              hs('div',{className:'cw-card-heading',children:[
+                h('h2',{className:'cw-panel-heading',id:'cw-current-title',children:'当前单词'}),
+                h('p',{className:'cw-progress','aria-label':'当前第 '+(state.displayIndex+1)+' 词，共 '+sessionWords.length+' 词',children:(state.displayIndex+1)+' / '+sessionWords.length})
+              ]}),cardBody(current,content,true),playerFooter
+            ]})
+          ]}),
+          hs('aside',{className:'cw-preferences',children:[
+            h('h2',{className:'cw-panel-heading',children:'显示设置'}),
+            hs('div',{className:'cw-preferences-body',children:[
+              displayControls(),pictureSizeControl(),
+              h('h3',{className:'cw-field-heading',children:'本次连播'}),
+              hs('dl',{className:'cw-session-metrics',children:[
+                h('dt',{children:'朗读'}),h('dd',{children:settings.readEnglish&&settings.readChinese?(settings.chineseFirst?'先中后英':'先英后中'):settings.readEnglish?'英文':settings.readChinese?'中文':'关闭'}),
+                h('dt',{children:'读完停留'}),h('dd',{children:settings.gapSeconds+' 秒'})
+              ]})
+            ]})
+          ]})
+        ]})
+      ]}):hs('div',{className:'cc-player-shell',children:[playerTopbar,cardBody(current,content,true),playerFooter]}));
+      return hs('div',{className:'cc-page'+(desktop?' cc-web-workspace':'')+(screen==='player'?' cc-playing-page':screen==='setup'?' cc-settings-page':''),'data-playback-status':screen!=='setup'?state.status:undefined,'data-playback-language':screen==='player'?state.language:undefined,onKeyDown:keyboard,children:[
+        desktop&&siteNav(jsx,'continuous'),
+        h('div',{className:desktop?'cw-screen':undefined,'aria-hidden':picker?'true':undefined,children:screen==='setup'?setupUI:screen==='directory'?h(PlaybackDirectory,{words:sessionWords,currentIndex:state.displayIndex,description:directoryDescription,getContent,meaningRevision,close:closeLayer,choose:chooseDirectoryWord}):playerUI}),
+        pickerUI,editingWord&&h(MeaningEditor,{...editingWord,close:closeMeaningEditor,requestCloseRef:editorCloseRef},editingWord.word.id)
+      ]});
     }
     return {Page};
   }
-  host.CijianContinuous=Object.freeze({create,selectCoreMeaning,guardEditorBack,createCardPresenter});
+  function siteNav(jsx,section){
+    const {jsx:h,jsxs:hs}=jsx;
+    function tab(id,href,label){
+      return id===section?h('span',{'aria-current':'page',children:label}):h('a',{href,children:label});
+    }
+    return h('header',{className:'cw-nav',children:hs('div',{className:'cw-nav-inner',children:[
+      hs('a',{className:'cw-brand',href:'../index.html','aria-label':'词间首页',children:[h('img',{src:'./assets/icon-192.png',width:36,height:36,alt:''}),'词间']}),
+      hs('nav',{'aria-label':'词间学习导航',children:[
+        tab('continuous','./?section=continuous#continuous','单词连播'),
+        tab('study','./?section=study#chapters','学习模式'),
+        h('a',{href:'../vocabulary.html',children:'电脑词表'}),
+        h('a',{href:'./?section=library',children:'词书与数据'})
+      ]})
+    ]})});
+  }
+  host.CijianContinuous=Object.freeze({create,selectCoreMeaning,guardEditorBack,createCardPresenter,siteNav});
 })(window);

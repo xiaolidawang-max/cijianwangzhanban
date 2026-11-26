@@ -1,6 +1,11 @@
 (function(host){
   'use strict';
   const VERSION='yunyang-lufs20-v1';
+  const scriptUrl=host.document?.currentScript?.src;
+  const appRoot=scriptUrl?new URL('../',scriptUrl):null;
+  function mediaUrl(url){
+    return appRoot&&url?.startsWith('/uploads/')?new URL(url.slice(1),appRoot).href:url;
+  }
   const normalizeText=value=>typeof value==='string'?value.normalize('NFC').trim().replace(/\s+/g,' '):'';
   // Parentheses are display punctuation; keep their contents in continuous speech.
   const speechText=value=>normalizeText(normalizeText(value).replace(/[()（）]/g,''));
@@ -8,7 +13,7 @@
     const manifest=env.manifest||host.CijianChineseAudioManifest||{};
     const fetcher=env.fetch||host.fetch?.bind(host);
     const chapters=new Set(manifest.chapters||[]);
-    const bundled=new Map((manifest.clips||[]).map(clip=>[speechText(clip.text),clip.url]));
+    const bundled=new Map((manifest.clips||[]).map(clip=>[speechText(clip.text),mediaUrl(clip.url)]));
     const memory=new Map(),inflight=new Map(),warming=new Set(),controllers=new Set();
     let dbPromise,destroyed=false;
     // Installed/offline builds use their bundled clips and saved custom clips.
@@ -46,7 +51,7 @@
       });
     }
     function hasChinese(word){return chapters.has(word?.chapter)}
-    function englishUrl(word){return manifest.english?.[word.id]||word.audioUrl}
+    function englishUrl(word){return mediaUrl(manifest.english?.[word.id]||word.audioUrl)}
     function prepare(word,value){
       if(destroyed)return Promise.reject(new Error('Chinese audio session closed'));
       if(!hasChinese(word))return Promise.resolve(null);
