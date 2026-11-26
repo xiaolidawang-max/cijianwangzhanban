@@ -43,6 +43,7 @@
 
   const storageKey = 'cijian-vocabulary-chapter';
   const playbackKey = 'cijian-vocabulary-detail-playback';
+  const pageParameters = new URLSearchParams(window.location.search);
   const playback = { auto: false, repeat: 1, rate: 1 };
   const noteKey = id => 'cijian-vocabulary-note:' + id;
   const sensesKey = id => 'cijian-vocabulary-senses:' + id;
@@ -69,7 +70,7 @@
   let cancelDetailEditor = null;
   let activeChapter = dataset.chapters[0].id;
   let desktopDirectoryOpen = true;
-  let mobileDirectoryOpen = false;
+  let mobileDirectoryOpen = pageParameters.get('view') === 'chapters';
 
   for (const entry of dataset.words) {
     const entries = chapterWords.get(entry.chapter);
@@ -81,11 +82,16 @@
     + dataset.words.length.toLocaleString('zh-CN') + ' 词';
   byId('directory-total').textContent = dataset.chapters.length + ' 章';
 
-  try {
-    const lastChapter = localStorage.getItem(storageKey);
-    if (chapterWords.has(lastChapter)) activeChapter = lastChapter;
-  } catch {
-    // Chapter selection still works when storage is unavailable.
+  const linkedChapter = pageParameters.get('chapter');
+  if (chapterWords.has(linkedChapter)) {
+    activeChapter = linkedChapter;
+  } else {
+    try {
+      const lastChapter = localStorage.getItem(storageKey);
+      if (chapterWords.has(lastChapter)) activeChapter = lastChapter;
+    } catch {
+      // Chapter selection still works when storage is unavailable.
+    }
   }
 
   try {
