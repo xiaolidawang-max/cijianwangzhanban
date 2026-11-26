@@ -1,5 +1,12 @@
 'use strict';
 
+if (window.location.protocol === 'file:') {
+  const onlineSite = 'https://xiaolidawang-max.github.io/cijianwangzhanban/';
+  document.querySelectorAll('[data-web-route]').forEach(link => {
+    link.href = new URL(link.getAttribute('href'), onlineSite).href;
+  });
+}
+
 const audioSample = document.getElementById('sample-audio');
 const listenButton = document.querySelector('.listen-button');
 const listenLabel = document.querySelector('.listen-label');

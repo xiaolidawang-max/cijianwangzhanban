@@ -1,0 +1,122 @@
+:root {
+  --ci-bg: #f6f5ee;
+  --ci-paper: #fffefa;
+  --ci-ink: #142b28;
+  --ci-muted: #546761;
+  --ci-line: #dcded4;
+  --ci-accent: #13564d;
+  --ci-accent-hover: #0c4239;
+  --ci-soft: #e7f0e9;
+  --ci-shade: #eaece2;
+  --ci-gloss: #ad6209;
+  --ci-gutter: clamp(1rem, 3.1vw, 3.25rem);
+  --ci-max: 90rem;
+  --ci-radius: 12px;
+  --ci-word-font: Georgia, 'Times New Roman', serif;
+}
+
+.ci-header,
+.ci-header * { box-sizing: border-box; }
+
+.ci-header {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  width: 100%;
+  border-bottom: 1px solid var(--ci-line);
+  background: var(--ci-paper);
+  color: var(--ci-ink);
+  font: 600 .875rem/1.3 'Cijian Latin', 'Cijian Han', system-ui, 'Microsoft YaHei', sans-serif;
+}
+
+.ci-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1rem, 3vw, 3rem);
+  max-width: var(--ci-max);
+  min-height: 64px;
+  margin-inline: auto;
+  padding-inline: var(--ci-gutter);
+}
+
+.ci-header a { color: inherit; text-decoration: none; }
+
+.ci-header .ci-brand {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding-block: 3px;
+  color: var(--ci-ink);
+  font-size: 1.25rem;
+  font-weight: 750;
+}
+
+.ci-brand img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 8px;
+  filter: hue-rotate(303deg) saturate(.76);
+}
+
+.ci-header .ci-nav {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: clamp(.25rem, 1vw, .9rem);
+  min-width: 0;
+}
+
+.ci-header .ci-nav :is(a, [aria-current="page"]),
+.ci-header .ci-utility {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: .42rem .75rem;
+  border-radius: 8px;
+  color: var(--ci-muted);
+  text-align: center;
+}
+
+.ci-header .ci-nav a:hover,
+.ci-header .ci-utility:hover,
+.ci-header .ci-nav [aria-current="page"] {
+  background: var(--ci-soft);
+  color: var(--ci-accent-hover);
+}
+
+.ci-header a:focus-visible {
+  outline: 2px solid var(--ci-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .ci-header-inner {
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 0;
+    padding-inline: max(10px, calc(var(--ci-gutter) - 4px));
+  }
+
+  .ci-header .ci-brand { margin: 3px auto 0 3px; }
+
+  .ci-header .ci-nav {
+    order: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+    gap: 2px;
+    padding-block: 0 4px;
+  }
+
+  .ci-header .ci-nav :is(a, [aria-current="page"]) {
+    padding-inline: 2px;
+    font-size: .8125rem;
+  }
+}

@@ -25,15 +25,18 @@
         toggledRef.current=id;
         setExpandedChapter(open=>open===id?null:id);
       }
-      return hs('div',{className:'sc-page',children:[
+      return hs('div',{className:'sc-page sc-course-page',children:[
         host.CijianContinuous.siteNav(jsx,'study'),
         hs('header',{className:'sc-header',children:[
           h('button',{type:'button',className:'sc-icon','aria-label':'返回模式选择',onClick:onModes,children:h(Icon,{name:'back'})}),
-          h('h1',{children:'学习模式'}),
+          hs('div',{className:'sc-heading-copy',children:[
+            h('p',{children:'雅思词汇真经'}),
+            h('h1',{id:'sc-directory-title',children:'章节目录'})
+          ]}),
           h('button',{type:'button',className:'sc-icon','aria-label':'学习设置',title:'学习设置',onClick:onSettings,children:h(Icon,{name:'settings'})})
         ]}),
         hs('div',{className:'sc-toolbar',children:[
-          hs('div',{className:'sc-toolbar-title',children:[h('h2',{id:'sc-directory-title',children:'章节目录'}),h('span',{children:chapters.length+' 章'})]}),
+          h('span',{className:'sc-course-count',children:'共 '+chapters.length+' 章'}),
           hs('button',{type:'button',className:'sc-all-words',onClick:onDirectory,children:[h(Icon,{name:'list',size:16}),h('span',{children:'全部单词'})]})
         ]}),
         hs('main',{className:'sc-content',ref:mainRef,'aria-labelledby':'sc-directory-title',children:[
@@ -41,13 +44,13 @@
           h('ol',{className:'sc-list',children:chapters.map((chapter,index)=>{
             const current=hasStarted&&index+1===chapterNumber,label='Chapter'+(index+1),expanded=expandedChapter===chapter.id;
             const panelId='sc-words-'+chapter.id,buttonId='sc-chapter-'+chapter.id;
-            return hs('li',{className:'sc-entry',children:[hs('button',{
+            return hs('li',{className:'sc-entry','data-expanded':expanded,children:[h('h2',{className:'sc-chapter-heading',children:hs('button',{
               type:'button',id:buttonId,className:'sc-chapter'+(current?' sc-current':''),ref:node=>{if(node)chapterRefs.current.set(chapter.id,node);else chapterRefs.current.delete(chapter.id);if(current)currentRef.current=node},disabled:!chapter.count,
               'aria-current':current?'true':undefined,'aria-label':label+'，'+chapter.count+' 词','aria-expanded':expanded,'aria-controls':panelId,onClick:()=>toggleChapter(chapter.id),children:[
-                h('strong',{children:label}),current&&h('span',{className:'sc-position',children:'上次学到'}),
+                h('strong',{lang:'en',children:label}),current&&h('span',{className:'sc-position',children:'上次学到'}),
                 h('span',{className:'sc-count',children:chapter.count+' 词'}),h(Icon,{name:'arrow',size:15})
               ]
-            }),h('div',{id:panelId,hidden:!expanded,children:expanded&&h('ol',{className:'sc-words','aria-label':label+'单词目录',children:(chapter.words||[]).map((word,wordIndex)=>{
+            })}),h('div',{id:panelId,hidden:!expanded,children:expanded&&h('ol',{className:'sc-words','aria-label':label+'单词目录',children:(chapter.words||[]).map((word,wordIndex)=>{
               const active=hasStarted&&word.id===currentWordId;
               return h('li',{children:hs('button',{type:'button',className:'sc-word'+(active?' sc-word-current':''),'aria-current':active?'true':undefined,'aria-label':'学习第 '+(wordIndex+1)+' 词 '+word.word,onClick:()=>onWord(word.id),children:[
                 h('span',{className:'sc-word-number','aria-hidden':true,children:wordIndex+1}),

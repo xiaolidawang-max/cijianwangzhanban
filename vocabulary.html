@@ -3,14 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#ffffff">
-  <title>词汇 · 词间</title>
+  <meta name="theme-color" content="#f6f5ee">
+  <title>单词查询 · 词间</title>
   <link rel="icon" href="assets/cijian.ico">
-  <link rel="stylesheet" href="vocabulary.css?v=home-link">
+  <link rel="stylesheet" href="./v30/assets/site-design.css?v=4307c5471f24">
+  <link rel="stylesheet" href="vocabulary.css?v=e8094c132555">
   <script src="vocabulary-data.js?v=backup-edits" defer></script>
-  <script src="vocabulary.js?v=chapter-links" defer></script>
+  <script src="vocabulary.js?v=654e823f83c8" defer></script>
 </head>
 <body>
+  <a class="vocab-skip" href="#vocabulary">跳到词汇表</a>
+  <header class="ci-header">
+    <div class="ci-header-inner">
+      <a class="ci-brand" href="./index.html" aria-label="词间首页">
+        <img src="./v30/assets/icon-192.png" width="36" height="36" alt="">
+        <span>词间</span>
+      </a>
+      <nav class="ci-nav" aria-label="网站导航">
+        <a id="continuous-link" data-web-route href="./v30/#continuous">单词连播</a>
+        <a data-web-route href="./v30/?section=study#chapters">逐词学习</a>
+        <a href="./vocabulary.html" aria-current="page">单词查询</a>
+        <a data-web-route href="./v30/?section=library">词书与数据</a>
+      </nav>
+    </div>
+  </header>
   <svg class="icon-symbols" aria-hidden="true">
     <symbol id="icon-eye" viewBox="0 0 24 24">
       <path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
@@ -46,21 +62,21 @@
     </button>
   </template>
   <div class="vocabulary-page">
-    <header class="toolbar">
+    <header class="vocabulary-heading">
+      <h1 id="book-title">单词查询</h1>
+      <div class="vocabulary-book">
+        <p>雅思词汇真经</p>
+        <p id="site-total"></p>
+      </div>
+    </header>
+    <div class="toolbar">
       <div class="book-heading">
         <button class="directory-toggle" id="toggle-directory" type="button" aria-controls="chapter-directory" aria-expanded="false">
           <svg class="ui-icon" aria-hidden="true"><use href="#icon-directory"></use></svg>
           <span>目录</span>
         </button>
-        <h1 id="book-title">雅思词汇真经</h1>
-        <p id="site-total"></p>
-        <a class="home-link" href="./index.html">返回首页</a>
-        <a class="home-link" id="continuous-link" href="./v30/#continuous">单词连播</a>
-        <script>
-          if (window.location.protocol === 'file:') {
-            document.getElementById('continuous-link').href = 'https://xiaolidawang-max.github.io/cijianwangzhanban/v30/#continuous';
-          }
-        </script>
+        <h2 id="current-chapter" lang="en"></h2>
+        <p id="chapter-status" role="status"></p>
       </div>
       <div class="controls">
         <label class="chapter-search">
@@ -72,23 +88,22 @@
           <span>全章朗读</span>
         </button>
       </div>
-    </header>
+    </div>
 
     <aside class="chapter-directory" id="chapter-directory">
       <div class="directory-header">
-        <a class="wordmark" href="#/vocabulary" aria-label="词间词汇首页">词间</a>
+        <div class="directory-heading">
+          <h2 id="directory-title">章节目录</h2>
+          <span id="directory-total"></span>
+        </div>
         <button class="directory-toggle" id="close-directory" type="button" aria-label="收起章节目录" title="收起章节目录" aria-controls="chapter-directory">
           <svg class="ui-icon" aria-hidden="true"><use href="#icon-directory"></use></svg>
         </button>
       </div>
-      <div class="directory-heading">
-        <h2 id="directory-title">章节</h2>
-        <span id="directory-total"></span>
-      </div>
       <nav id="chapter-list" aria-labelledby="directory-title"></nav>
     </aside>
 
-    <main id="vocabulary" class="workspace" aria-labelledby="book-title">
+    <main id="vocabulary" class="workspace" aria-labelledby="book-title" tabindex="-1">
 
       <p class="scroll-hint">横向滑动查看笔记</p>
       <div class="table-scroller" tabindex="0" role="region" aria-label="词汇表">
@@ -134,7 +149,6 @@
           <tbody id="words"></tbody>
         </table>
       </div>
-      <p id="chapter-status" class="sr-only" role="status"></p>
       <p id="audio-status" class="sr-only" role="status"></p>
       <noscript><p>启用 JavaScript 后即可查看词汇和播放音频。</p></noscript>
     </main>

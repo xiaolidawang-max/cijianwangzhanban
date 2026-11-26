@@ -1,6 +1,13 @@
 (() => {
   'use strict';
 
+  if (window.location.protocol === 'file:') {
+    const onlineSite = 'https://xiaolidawang-max.github.io/cijianwangzhanban/';
+    document.querySelectorAll('[data-web-route]').forEach(link => {
+      link.href = new URL(link.getAttribute('href'), onlineSite).href;
+    });
+  }
+
   const byId = id => document.getElementById(id);
   const dataset = window.CIJIAN_VOCABULARY;
   const directory = byId('chapter-directory');
@@ -78,7 +85,7 @@
     entries.push({ ...entry, number: entries.length + 1 });
   }
 
-  byId('site-total').textContent = dataset.chapters.length + ' 章　'
+  byId('site-total').textContent = dataset.chapters.length + ' 章 · '
     + dataset.words.length.toLocaleString('zh-CN') + ' 词';
   byId('directory-total').textContent = dataset.chapters.length + ' 章';
 
@@ -112,12 +119,9 @@
   for (const [index, entry] of dataset.chapters.entries()) {
     const button = node('button', 'chapter-item');
     button.type = 'button';
-    const number = String(index + 1).padStart(2, '0');
-    button.append(
-      node('span', 'chapter-number', number),
-      node('span', 'chapter-name', entry.name),
-      node('span', 'chapter-word-count', chapterWords.get(entry.id).length + ' 词')
-    );
+    const label = node('span', 'chapter-name', 'Chapter' + (index + 1));
+    label.lang = 'en';
+    button.append(label, node('span', 'chapter-word-count', chapterWords.get(entry.id).length + ' 词'));
     button.addEventListener('click', () => selectChapter(entry.id));
     chapterItems.set(entry.id, button);
     directoryList.append(button);
@@ -593,9 +597,8 @@
     const keyword = normalize(search.value);
     visible = keyword ? entries.filter(entry => normalize(entry.word).includes(keyword)
       || getSenses(entry).some(sense => normalize(sense.meaning || '').includes(keyword))) : entries;
-    byId('chapter-status').textContent = keyword
-      ? '搜索结果 ' + visible.length + ' 词'
-      : chapterItems.get(activeChapter).querySelector('.chapter-name').textContent + '，' + entries.length + ' 词';
+    byId('current-chapter').textContent = chapterItems.get(activeChapter).querySelector('.chapter-name').textContent;
+    byId('chapter-status').textContent = (keyword ? '找到 ' : '') + visible.length + ' 词';
     chapterButton.disabled = !entries.length;
     rowAudio.clear();
     const fragment = document.createDocumentFragment();

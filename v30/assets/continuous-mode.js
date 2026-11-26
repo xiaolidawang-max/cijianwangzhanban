@@ -725,9 +725,9 @@
       ]}):hs('div',{className:'cc-setup-shell cc-setup-native',children:[
         hs('header',{className:'cc-topbar cc-setup-topbar',children:[
           h('button',{type:'button',className:'cc-icon-button cc-back-button','aria-label':'退出简洁模式',onClick:leave,children:h(Icon,{name:'back',size:20})}),
-          h('h1',{ref:setupTitleRef,tabIndex:-1,children:'简洁模式'})
+          h('h1',{ref:setupTitleRef,tabIndex:-1,children:'单词连播'})
         ]}),
-        h('div',{className:'cc-setup-tabs',role:'tablist','aria-label':'简洁模式设置',children:setupTabs.map(({id,label},index)=>
+        h('div',{className:'cc-setup-tabs',role:'tablist','aria-label':'连播设置',children:setupTabs.map(({id,label},index)=>
           h('button',{type:'button',role:'tab',id:'cc-tab-'+id,'aria-controls':'cc-panel-'+id,'aria-selected':setupTab===id,tabIndex:setupTab===id?0:-1,onClick:()=>setSetupTab(id),onKeyDown:e=>tabKeyDown(e,index),children:label},id)
         )}),
         hs('main',{className:'cc-setup-main',ref:settingsMainRef,children:[rangePanel,readingPanel,rhythmPanel,setupNotice]}),
@@ -737,7 +737,7 @@
         const wordGroups=displayedMeaningGroups(word,bodyContent);
         return hs(desktop?'section':'main',{className:'cc-player-body',style:{'--cc-picture-scale':settings.pictureSize/100},'data-chapter':word.chapter,'data-word-id':word.id,tabIndex:editable?0:undefined,'aria-label':settings.showEnglish?word.word+' 词卡':'词卡',children:[
           h(WordPicture,{word,images,showEnglish:settings.showEnglish},word.id+'|'+word.imageUrl),
-          hs('div',{className:'cc-word-block'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,children:[h(desktop?'h3':'h1',{className:word.word.length>18?'cc-long-word':undefined,children:word.word}),h('p',{className:'cc-ipa',children:word.ipa||'\u00a0'})]}),
+          hs('div',{className:'cc-word-block'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,children:[h(desktop?'h3':'h1',{lang:'en',className:word.word.length>18?'cc-long-word':undefined,children:word.word}),h('p',{className:'cc-ipa',children:word.ipa||'\u00a0'})]}),
           h('p',{className:'cc-english'+(settings.showEnglish?'':' cc-content-hidden'),'aria-hidden':!settings.showEnglish,lang:'en',children:bodyContent.english||'\u00a0'}),
           hs('div',{className:'cc-meaning-row'+(settings.showChinese?'':' cc-content-hidden'),'aria-hidden':!settings.showChinese,children:[
             h(MeaningBlock,{groups:wordGroups}),
@@ -783,7 +783,10 @@
             hs('section',{className:'cw-card-panel','aria-labelledby':'cw-current-title',children:[
               hs('div',{className:'cw-card-heading',children:[
                 h('h2',{className:'cw-panel-heading',id:'cw-current-title',children:'当前单词'}),
-                h('p',{className:'cw-progress','aria-label':'当前第 '+(state.displayIndex+1)+' 词，共 '+sessionWords.length+' 词',children:(state.displayIndex+1)+' / '+sessionWords.length})
+                hs('div',{className:'cw-position',children:[
+                  h('progress',{max:sessionWords.length,value:state.displayIndex+1,'aria-label':'本次连播进度'}),
+                  h('span',{className:'cw-progress',children:(state.displayIndex+1)+' / '+sessionWords.length})
+                ]})
               ]}),cardBody(current,content,true),playerFooter
             ]})
           ]}),
@@ -801,8 +804,8 @@
         ]})
       ]}):hs('div',{className:'cc-player-shell',children:[playerTopbar,cardBody(current,content,true),playerFooter]}));
       return hs('div',{className:'cc-page'+(desktop?' cc-web-workspace':'')+(screen==='player'?' cc-playing-page':screen==='setup'?' cc-settings-page':''),'data-playback-status':screen!=='setup'?state.status:undefined,'data-playback-language':screen==='player'?state.language:undefined,onKeyDown:keyboard,children:[
-        desktop&&siteNav(jsx,'continuous'),
-        h('div',{className:desktop?'cw-screen':undefined,'aria-hidden':picker?'true':undefined,children:screen==='setup'?setupUI:screen==='directory'?h(PlaybackDirectory,{words:sessionWords,currentIndex:state.displayIndex,description:directoryDescription,getContent,meaningRevision,close:closeLayer,choose:chooseDirectoryWord}):playerUI}),
+        (desktop||screen==='setup')&&h('div',{className:'cw-site-nav',inert:!!picker,children:siteNav(jsx,'continuous')}),
+        h('div',{className:'cw-screen',inert:!!picker,children:screen==='setup'?setupUI:screen==='directory'?h(PlaybackDirectory,{words:sessionWords,currentIndex:state.displayIndex,description:directoryDescription,getContent,meaningRevision,close:closeLayer,choose:chooseDirectoryWord}):playerUI}),
         pickerUI,editingWord&&h(MeaningEditor,{...editingWord,close:closeMeaningEditor,requestCloseRef:editorCloseRef},editingWord.word.id)
       ]});
     }
@@ -813,13 +816,13 @@
     function tab(id,href,label){
       return id===section?h('span',{'aria-current':'page',children:label}):h('a',{href,children:label});
     }
-    return h('header',{className:'cw-nav',children:hs('div',{className:'cw-nav-inner',children:[
-      hs('a',{className:'cw-brand',href:'../index.html','aria-label':'词间首页',children:[h('img',{src:'./assets/icon-192.png',width:36,height:36,alt:''}),'词间']}),
-      hs('nav',{'aria-label':'词间学习导航',children:[
+    return h('header',{className:'ci-header',children:hs('div',{className:'ci-header-inner',children:[
+      hs('a',{className:'ci-brand',href:'../index.html','aria-label':'词间首页',children:[h('img',{src:'./assets/icon-192.png',width:32,height:32,alt:''}),h('span',{children:'词间'})]}),
+      hs('nav',{className:'ci-nav','aria-label':'词间学习导航',children:[
         tab('continuous','./?section=continuous#continuous','单词连播'),
-        tab('study','./?section=study#chapters','学习模式'),
-        h('a',{href:'../vocabulary.html',children:'电脑词表'}),
-        h('a',{href:'./?section=library',children:'词书与数据'})
+        tab('study','./?section=study#chapters','逐词学习'),
+        tab('directory','../vocabulary.html','单词查询'),
+        tab('library','./?section=library','词书与数据')
       ]})
     ]})});
   }

@@ -15,13 +15,16 @@
         window.addEventListener('keydown',onKey);
         return function(){window.removeEventListener('keydown',onKey)};
       },[close]);
-      return h('main',{className:'stp-page'+(variant==='data'?' stp-data-page':''),'aria-labelledby':'stp-page-title',children:hs('div',{className:'stp-layout',children:[
-        hs('header',{className:'stp-header',children:[
-          h('button',{type:'button',className:'stp-back','aria-label':'返回上一页',title:'返回上一页',onClick:close,children:h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':true,focusable:'false',children:h('path',{d:'m14.5 5-7 7 7 7'})})}),
-          h('h1',{className:'stp-title',id:'stp-page-title',ref:titleRef,tabIndex:-1,children:title})
-        ]}),
-        h('div',{className:'stp-content',children})
-      ]})});
+      return hs('div',{className:'stp-page collection-settings'+(variant==='data'?' stp-data-page':''),children:[
+        host.CijianContinuous.siteNav(jsx,variant==='data'?'library':'study'),
+        hs('main',{className:'stp-layout','aria-labelledby':'stp-page-title',children:[
+          hs('header',{className:'stp-header collection-heading',children:[
+            h('button',{type:'button',className:'stp-back','aria-label':'返回上一页',title:'返回上一页',onClick:close,children:h('svg',{width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':true,focusable:'false',children:h('path',{d:'m14.5 5-7 7 7 7'})})}),
+            h('h1',{className:'stp-title',id:'stp-page-title',ref:titleRef,tabIndex:-1,children:title})
+          ]}),
+          h('div',{className:'stp-content',children})
+        ]})
+      ]});
     }
     return {Page};
   }

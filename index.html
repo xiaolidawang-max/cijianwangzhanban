@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f8fc">
+  <meta name="theme-color" content="#f6f5ee">
   <meta name="description" content="词间 · 雅思词汇真经。22 章，3,623 词，支持配图、中英连播及章节离线下载。">
   <title>词间 · 雅思词汇真经</title>
   <link rel="icon" href="./assets/cijian.ico">
-  <link rel="stylesheet" href="./home.css?v=glacier">
-  <script src="./home.js?v=glacier" defer></script>
+  <link rel="stylesheet" href="./v30/assets/site-design.css?v=4307c5471f24">
+  <link rel="stylesheet" href="./home.css?v=35ddc4c45b3f">
+  <script src="./home.js?v=452e194d6d7e" defer></script>
   <script>
     if (window.location.hash === '#/vocabulary') {
       window.location.replace('./vocabulary.html#/vocabulary');
@@ -17,15 +18,17 @@
 </head>
 <body>
   <a class="skip-link" href="#main">跳到主要内容</a>
-  <header class="site-header">
-    <div class="shell header-content">
-      <a class="brand" href="./index.html" aria-label="词间首页">
+  <header class="ci-header">
+    <div class="ci-header-inner">
+      <a class="ci-brand" href="./index.html" aria-label="词间首页" aria-current="page">
         <img src="./v30/assets/icon-192.png" width="36" height="36" alt="">
         <span>词间</span>
       </a>
-      <nav class="site-nav" aria-label="网站导航">
-        <a href="#chapters">章节目录</a>
-        <a href="https://github.com/xiaolidawang-max/cijianwangzhanban">GitHub <span aria-hidden="true">↗</span></a>
+      <nav class="ci-nav" aria-label="网站导航">
+        <a data-web-route href="./v30/?section=continuous#continuous">单词连播</a>
+        <a data-web-route href="./v30/?section=study#chapters">逐词学习</a>
+        <a href="./vocabulary.html">单词查询</a>
+        <a data-web-route href="./v30/?section=library">词书与数据</a>
       </nav>
     </div>
   </header>
@@ -34,11 +37,11 @@
     <section class="shell hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="book-label">雅思词汇真经</p>
-        <h1 id="hero-title"><span>看图记词，</span><span>中英连播。</span></h1>
-        <p class="hero-description"><strong>22 章 · 3,623 词</strong><br>选章开始连播，下载后可离线听。</p>
+        <h1 id="hero-title"><span>看图记词</span><span>中英连播</span></h1>
+        <p class="hero-description"><strong>22 章、3,623 个词。</strong> 选章听英文单词与中文释义，下载后随时离线复习。</p>
         <div class="hero-actions">
-          <a class="start-link" href="./v30/#continuous">开始背词 <span aria-hidden="true">→</span></a>
-          <a class="table-link" href="./vocabulary.html">打开电脑词表</a>
+          <a class="start-link" data-web-route href="./v30/#continuous">开始连播 <span aria-hidden="true">→</span></a>
+          <a class="study-link" data-web-route href="./v30/?section=study#chapters">逐词学习 <span aria-hidden="true">↗</span></a>
         </div>
       </div>
 
@@ -48,7 +51,7 @@
             <source media="(max-width: 560px)" srcset="./assets/home-glacier-mobile.webp">
             <img class="flashcard-photo" src="./assets/home-glacier.webp" width="1100" height="688" alt="蓝色冰川沿着两侧岩山之间的谷地流下" fetchpriority="high">
           </picture>
-          <span class="card-chapter">Chapter 1</span>
+          <span class="card-chapter" lang="en">Chapter1</span>
         </div>
         <div class="flashcard-content">
           <div class="word-line">
@@ -79,24 +82,30 @@
         </div>
         <ul class="chapter-list">
           <li><a class="chapter" href="./vocabulary.html?chapter=geography">
-            <span class="chapter-line"><strong>Chapter 1</strong><span>240 词</span></span>
+            <span class="chapter-line"><strong lang="en">Chapter1</strong><span>240 词</span></span>
             <span class="chapter-examples" lang="en">atmosphere · glacier</span>
           </a></li>
           <li><a class="chapter" href="./vocabulary.html?chapter=plants">
-            <span class="chapter-line"><strong>Chapter 2</strong><span>127 词</span></span>
+            <span class="chapter-line"><strong lang="en">Chapter2</strong><span>127 词</span></span>
             <span class="chapter-examples" lang="en">photosynthesis · vegetation</span>
           </a></li>
           <li><a class="chapter" href="./vocabulary.html?chapter=ch03">
-            <span class="chapter-line"><strong>Chapter 3</strong><span>166 词</span></span>
+            <span class="chapter-line"><strong lang="en">Chapter3</strong><span>166 词</span></span>
             <span class="chapter-examples" lang="en">zoologist · mammal</span>
           </a></li>
           <li><a class="chapter" href="./vocabulary.html?chapter=ch04">
-            <span class="chapter-line"><strong>Chapter 4</strong><span>75 词</span></span>
+            <span class="chapter-line"><strong lang="en">Chapter4</strong><span>75 词</span></span>
             <span class="chapter-examples" lang="en">galaxy · universe</span>
           </a></li>
         </ul>
       </div>
     </section>
   </main>
+  <footer class="home-footer">
+    <div class="shell footer-content">
+      <span>词间 · 雅思词汇真经</span>
+      <a href="https://github.com/xiaolidawang-max/cijianwangzhanban">GitHub <span aria-hidden="true">↗</span></a>
+    </div>
+  </footer>
 </body>
 </html>
