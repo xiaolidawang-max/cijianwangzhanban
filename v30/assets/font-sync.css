@@ -1,0 +1,8 @@
+/* The same offline font files are used by the preview and Android WebView. */
+@font-face{font-family:'Cijian Latin';src:url('fonts/arimo.woff2') format('woff2');font-style:normal;font-weight:400 700;font-display:block}
+@font-face{font-family:'Cijian Han';src:url('fonts/noto-sans-sc.woff2') format('woff2');font-style:normal;font-weight:100 900;font-display:block}
+.cc-page,.bh-page,.mode-page,.stp-page{font-family:'Cijian Latin','Cijian Han',sans-serif}
+.cc-player-body .cc-word-block h1,.cc-player-body .cc-ipa,.cc-player-body .cc-english,.cc-player-body .cc-meaning{font-family:'Cijian Latin','Cijian Han',sans-serif}
+/* Keep a long definition inside the card at every device width. */
+.cc-player-body{grid-template-columns:minmax(0,1fr)}
+.cc-player-body .cc-english,.cc-player-body .cc-meaning{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;overflow-x:hidden}

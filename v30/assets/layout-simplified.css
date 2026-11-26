@@ -1,0 +1,203 @@
+/* Keep the book and chapter lists as the primary entry points. */
+.books-page .books-resume,
+.books-page .books-heading p,
+.home-page .home-search,
+.home-page .home-heading,
+.home-page .home-overview {
+  display: none;
+}
+
+.books-page .books-heading {
+  margin-bottom: 20px;
+}
+
+.books-page .books-list-heading {
+  margin-top: 0;
+}
+
+.home-page .home-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.home-page .home-main {
+  max-width: 900px;
+}
+
+@media (max-width: 900px) {
+  .books-page .books-heading {
+    margin-bottom: 18px;
+  }
+
+  .home-page .home-main {
+    padding-top: 18px;
+  }
+}
+
+/* Keep navigation compact; actions remain available within the learning view. */
+.books-page .books-nav,
+.home-page .home-nav,
+.st-app-header nav,
+.st-app-header .st-app-settings { display: none; }
+
+.st-finder-meta { flex-wrap: wrap; }
+.st-finder-favorites {
+  min-height: 40px; padding: 0 12px; border: 1px solid #d4e1f3;
+  border-radius: 7px; background: #f5f8fd; color: #3569b9;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.st-finder-favorites:hover { background: #eaf2fc; }
+@media (max-width: 480px) {
+  .st-finder-meta { gap: 8px; }
+  .st-finder-meta select { max-width: 100%; flex: 1 1 150px; min-width: 0; }
+  .st-finder-meta > span { flex-basis: 100%; }
+}
+
+.home-page .home-header-inner, .st-app-header { gap: 6px; }
+.simple-back { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 40px; height: 44px; margin-left: -10px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #33475d; cursor: pointer; }
+.simple-back:hover { background: #f1f5fa; }
+.simple-back:focus-visible { outline: 2px solid #3569b9; outline-offset: 1px; }
+
+/* The saved progress remains automatic, without a persistent footer notice. */
+.books-footer, .home-footer { display: none; }
+/* The chapter selector above the word now opens the directory. */
+.st-turner > button.st-dock-directory { display: none; }
+.st-turner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+/* Full-screen word directory, separate from the learning card. */
+.word-list-page {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  color: #202328;
+  background: #f3f4f6;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+}
+.word-list-page * { box-sizing: border-box; }
+.word-list-page button, .word-list-page input { font: inherit; }
+.word-list-header {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 10px;
+  min-height: 64px;
+  padding: max(8px, env(safe-area-inset-top)) 16px 8px;
+  background: #fff;
+  border-bottom: 1px solid #e7e8ea;
+}
+.word-list-title { flex: 1; min-width: 0; margin: 0; font-size: 21px; font-weight: 500; line-height: 1.3; }
+.word-list-back, .word-list-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #25282c;
+  cursor: pointer;
+}
+.word-list-back { margin-left: -9px; }
+.word-list-search-toggle { margin-right: -9px; }
+.word-list-back:hover, .word-list-search-toggle:hover { background: #f4f6f8; }
+.word-list-controls {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e8e9ec;
+}
+.word-list-search { display: flex; flex: 1 1 160px; min-width: 0; align-items: center; gap: 8px; }
+.word-list-search input {
+  width: 100%; min-width: 0; min-height: 42px; padding: 8px 12px;
+  border: 1px solid #dce1e7; border-radius: 7px; background: #fff; color: #202328;
+  font-size: 15px;
+}
+.word-list-favorites {
+  flex: none; min-height: 40px; padding: 7px 14px; border: 0; border-radius: 22px;
+  background: #e5f1fd; color: #2873bd; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.word-list-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+.word-list-chapter { min-width: 0; }
+.word-list-chapter-button {
+  display: flex; align-items: center; gap: 9px; width: 100%; min-height: 48px;
+  padding: 9px 17px; border: 0; border-bottom: 1px solid #e1e3e7;
+  background: #f3f4f6; color: #24272b; text-align: left; font-size: 16px;
+  font-weight: 400; cursor: pointer;
+}
+.word-list-chapter-button:hover { background: #e9edf2; }
+.word-list-chevron { display: inline-flex; flex: none; align-items: center; color: #a3a9b0; }
+.word-list-chapter-name { min-width: 0; overflow-wrap: anywhere; }
+.word-list-count { flex: none; color: #4c535b; font-size: 14px; }
+.word-list-words { background: #fff; }
+.word-list-word { min-width: 0; }
+.word-list-page .word-list-word .st-result {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 58px;
+  padding: 10px 18px 10px 42px; border: 0; border-bottom: 1px solid #eceef0;
+  background: #fff; color: #202328; text-align: left; cursor: pointer;
+}
+.word-list-page .word-list-word .st-result:hover,
+.word-list-page .word-list-word .st-result.selected { background: #f1f6fd; }
+.word-list-page .word-list-word .st-result strong { font: 500 16px/1.4 system-ui, -apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+.word-list-page .word-list-word .st-result small { font-size: 13px; line-height: 1.45; color: #6c7480; }
+.word-list-empty { padding: 40px 24px; background: #fff; color: #6c7480; text-align: center; font-size: 14px; }
+.word-list-page button:focus-visible, .word-list-page input:focus-visible { outline: 2px solid #3569b9; outline-offset: -2px; }
+@media (min-width: 900px) {
+  .word-list-header, .word-list-controls { padding-left: max(24px, calc((100vw - 900px) / 2)); padding-right: max(24px, calc((100vw - 900px) / 2)); }
+  .word-list-list > .word-list-chapter, .word-list-empty { max-width: 900px; margin: 0 auto; }
+}
+
+.st-card-meta { padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.st-card-meta:focus-visible { outline: 2px solid #3569b9; outline-offset: 3px; }
+
+/* The home settings button sits at the far right of the header. */
+.books-page .books-settings { margin-left: auto; }
+
+/* Start a fresh line when the part of speech changes. */
+.st-preview-break { display: none; }
+@media (max-width: 720px) and (orientation: portrait) {
+  .st-chapter-grouped .st-preview-break { display: block; flex: 0 0 100%; height: 0; }
+}
+
+/* Keep each collocation readable at one consistent size on phones. */
+@media (max-width: 720px) and (orientation: portrait) {
+  .st-shell .st-mobile-phrase-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 16px;
+    min-width: 0;
+  }
+  .st-shell .st-mobile-summary .st-mobile-phrase-row > p,
+  .st-shell .st-mobile-summary .st-mobile-phrase-row > small {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin: 0;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    font: 400 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    -webkit-line-clamp: unset;
+  }
+}
+
+/* Fit image visibility alongside the existing word-card controls. */
+@media (max-width: 420px) and (orientation: portrait) {
+  .st-mobile-tools .st-icon { width: 38px; }
+}
+@media (max-width: 350px) and (orientation: portrait) {
+  .st-mobile-tools .st-mobile-count { display: none; }
+}

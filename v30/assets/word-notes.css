@@ -1,0 +1,8 @@
+.cn-section{flex:none;min-width:0;margin:10px 0 12px;padding:10px 0 0;border-top:1px solid var(--st-line,#e7ebef)}
+.cn-section h4{margin:0;color:var(--st-muted,#7d8791);font-size:13px;font-weight:500;line-height:20px}
+.cn-section .cn-text{margin:7px 0 3px;color:var(--st-ink,#28343f);font-size:15px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.cn-pencil{display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin:3px 0 0 -7px;padding:7px;border:0;border-radius:5px;background:transparent;color:#3478d4!important;cursor:pointer}
+.cn-pencil:hover{color:#245fae!important;background:#edf4ff}.cn-pencil:focus-visible{outline:2px solid #83b0ed;outline-offset:2px}.cn-pencil svg{display:block;flex:none}
+.cn-editor{max-width:620px}.cn-editor-body{padding-top:14px}.cn-editor textarea{display:block;box-sizing:border-box;width:100%;min-height:180px;max-height:55dvh;resize:vertical;border:1px solid #d0dbe4;border-radius:8px;padding:12px;color:#28343f;background:#fff;font:16px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif}
+.cn-editor textarea:focus{outline:2px solid #83b0ed;outline-offset:1px}.cn-actions{justify-content:flex-end}.cn-error{color:#a74732;font-size:13px}
+@media(max-width:720px){.st-word-card>.cn-section{margin-left:0;margin-right:0}.cn-section{margin-top:12px;margin-bottom:14px}}

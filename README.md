@@ -2,6 +2,10 @@
 
 《雅思词汇真经》离线词汇表，包含词库和发音文件。
 
+## 手机网页版
+
+打开 [词间 V30](https://xiaolidawang-max.github.io/cijianwangzhanban/v30/)，在简洁模式里可连播多章，也可用章节旁的「下载」按钮保存图片和录音供离线使用。iPhone 上可以用 Safari「添加到主屏幕」。
+
 ## Windows 桌面快捷方式
 
 1. 在 GitHub 点击 **Code → Download ZIP**，将下载的文件完整解压到你希望长期保存的位置。

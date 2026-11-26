@@ -1,0 +1,107 @@
+/* V4 手机竖屏预览：让词义和用法优先占用首屏，长内容自然滚动。 */
+@media (max-width: 720px) and (orientation: portrait) {
+  .st-main { overflow-y: auto; }
+  .st-content { height: auto; min-height: 100%; }
+  .st-reading-grid, .st-card-column, .st-word-card { min-height: min-content; }
+  .st-word-card { overflow: visible; }
+  .st-mobile-tools { flex-basis: 48px; }
+
+  .st-card-body {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    min-height: min-content;
+  }
+  .st-lexeme { display: block; flex: none; }
+  .st-lexeme-header {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    min-height: 0;
+  }
+  .st-word-title { width: 100%; max-width: 100%; overflow: visible; }
+  .st-lexeme h2, .st-lexeme h2.st-long-word {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+  }
+  .st-pronunciation {
+    flex: none;
+    width: 100%;
+    height: auto;
+    min-height: 44px;
+    gap: 2px;
+  }
+  .st-pronunciation > span {
+    flex: 0 1 auto;
+    max-height: none;
+    overflow: visible;
+    line-height: 20px;
+    transform: none;
+  }
+  .st-pronunciation .st-play {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .st-pronunciation .st-play svg { width: 16px; height: 16px; }
+  .st-meaning-slot { height: auto; min-height: 40px; overflow: visible; }
+  .st-shell .st-meaning-preview { max-height: none; }
+  .st-preview-sense > span {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    overflow-wrap: anywhere;
+  }
+  .st-preview-sense > .st-glosses {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: none;
+  }
+
+  .st-illustration {
+    flex: none;
+    height: clamp(150px, 25svh, 210px);
+    margin: 4px 0 10px;
+  }
+  .st-mobile-summary {
+    display: block;
+    flex: none;
+    height: auto;
+    overflow: visible;
+  }
+  .st-mobile-summary section { height: auto; }
+  .st-mobile-summary p, .st-mobile-summary small {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+  }
+  .st-mobile-definition > p { height: auto; }
+  .st-mobile-summary .st-mobile-phrase { margin-top: 10px; }
+  .st-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    flex: none;
+    margin-top: auto;
+    background: #fff;
+  }
+}
+
+/* 第一章：不同义项分组，词性在每组重复；空间不足时整组换行。 */
+@media (max-width: 720px) and (orientation: portrait) {
+  .st-shell .st-meaning-preview.st-chapter-grouped {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    column-gap: 14px;
+    row-gap: 0;
+  }
+  .st-chapter-grouped .st-preview-sense {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    flex: 0 1 auto;
+  }
+}

@@ -163,6 +163,15 @@ button:disabled { cursor: default; opacity: .45; }
 }
 
 #site-total { margin: 0; color: var(--muted); font-size: .75rem; white-space: nowrap; }
+.mobile-web-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  color: var(--ink);
+  font-size: .8125rem;
+  text-underline-offset: .18em;
+  white-space: nowrap;
+}
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: .625rem; }
 .chapter-search {
   display: flex;
